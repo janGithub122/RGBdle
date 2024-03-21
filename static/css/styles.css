@@ -1,0 +1,22 @@
+/* layout */
+#border {
+    border: 10px solid #ffffff;
+}
+
+#background {
+   background-color:rgb(29, 29, 55);
+}
+
+.center {
+display: block;
+margin-left: auto;
+margin-right: auto;
+}
+
+
+#dev_testing {
+    text-align: center;
+    color: rgb(29, 29, 55);
+}
+
+

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="static/css/styles.css"/>
+    <meta charset="UTF-8">
+    <title>RGBdle</title>
+    <link rel="icon" type="image/x-icon" href="static/css/images/rgbdleFavicon.png">
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); 
+
+            const formData = new FormData(document.getElementById("guessForm"));
+
+            fetch("{{url_for('handle_data')}}", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("There was a problem with the fetch operation:", error);
+            });
+        }
+    </script>
+</head>
+
+<body id="background">
+    <img src="static/css/images/rgbdleLogo.png" class="center"
+    width="500"
+    height="200">
+    <img src="static/css/images/rgbColor.png" class="center" id=border>
+    <p id="dev_testing">Current Value: {{ value }}</p> <!--DEV This is for testing, delete when finished-->
+   
+    <form id="guessForm">
+        <input type="number" min="0" max="255" name="user_guess" class="center">
+        <input type="submit" class="center" onclick="submitForm(event);">
+    </form>
+</body>
+</html>
