@@ -5,12 +5,17 @@
     <meta charset="UTF-8">
     <title>RGBdle</title>
     <link rel="icon" type="image/x-icon" href="static/css/images/rgbdleFavicon.png">
-    <script>
+    
+    <!--This script stops the page from refreshing on submit-->
+    <script> 
+    //$('#form').submit(false);
         function submitForm(event) {
-            event.preventDefault(); 
-
+            //prevents events, doesnt work if no input on submitForm
+            event.preventDefault();
+        
+            // this line is your guess
             const formData = new FormData(document.getElementById("guessForm"));
-
+            
             fetch("{{url_for('handle_data')}}", {
                 method: "POST",
                 body: formData
@@ -28,6 +33,8 @@
                 console.error("There was a problem with the fetch operation:", error);
             });
         }
+        // onclick or this
+        document.getElementById('guessForm').addEventListener('submit', submitForm)
     </script>
 </head>
 
@@ -40,7 +47,9 @@
    
     <form id="guessForm">
         <input type="number" min="0" max="255" name="user_guess" class="center">
-        <input type="submit" class="center" onclick="submitForm(event);">
+        <!--<button class="center" onclick="submitForm(event) type=submit">Submit</button>-->
+        <input type="submit" class="center" onsubmit = "submitForm(event)">
+        <!--onclick respects the min & max, onsubmit respects the prevent default-->
     </form>
 </body>
 </html>
