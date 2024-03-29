@@ -30,15 +30,28 @@ def random_RGB():
 
 def guess_checker():
    global correct_answer
-   
-   if user_value == str(rgbValues[0]):
-      print("--Correct--")
-      correct_answer = True
-   else:
-      print("--Incorrect--")
-      correct_answer = False
-      #print(float(rgbValues[0]))
+   global distance
+   distance =  abs(int(rgbValues[0])-int(user_value))
 
+   if user_value == str(rgbValues[0]):
+      correct_answer = True
+      print("--Correct--")
+   elif distance >= 100:
+      correct_answer = False
+      print("The user is 100 or more off for R")
+   elif distance >= 50:
+      correct_answer = False
+      print("The user is 50 or more off for R")
+   elif distance >= 25:
+      correct_answer = False
+      print("The user is 25 or more off for R")
+   elif distance >= 10:
+      correct_answer = False
+      print("The user is 10 or more off for R")
+   elif distance < 10:
+      correct_answer = False
+      print("The user is under 10 values off for R")
+      
 
 @app.route('/') 
 
@@ -52,8 +65,7 @@ def home():
 def handle_data():
    global user_value
    formpath = request.form['user_guess']
-   user_value = str(formpath)
-   #print(user_value) 
+   user_value = str(formpath) 
    guess_checker()
    return ("Pass")
 

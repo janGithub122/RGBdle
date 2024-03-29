@@ -8,12 +8,9 @@
     
     <!--This script stops the page from refreshing on submit-->
     <script> 
-    //$('#form').submit(false);
         function submitForm(event) {
-            //prevents events, doesnt work if no input on submitForm
-            event.preventDefault();
+            event.preventDefault(); // Prevent the default form submission behavior
         
-            // this line is your guess
             const formData = new FormData(document.getElementById("guessForm"));
             
             fetch("{{url_for('handle_data')}}", {
@@ -33,8 +30,10 @@
                 console.error("There was a problem with the fetch operation:", error);
             });
         }
-        // onclick or this
-        document.getElementById('guessForm').addEventListener('submit', submitForm)
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('guessForm').addEventListener('submit', submitForm);
+        });
     </script>
 </head>
 
@@ -46,10 +45,8 @@
     <p id="dev_testing">Current Value: {{ value }}</p> <!--DEV This is for testing, delete when finished-->
    
     <form id="guessForm">
-        <input type="number" min="0" max="255" name="user_guess" class="center">
-        <!--<button class="center" onclick="submitForm(event) type=submit">Submit</button>-->
-        <input type="submit" class="center" onsubmit = "submitForm(event)">
-        <!--onclick respects the min & max, onsubmit respects the prevent default-->
+        <input type="number" min="0" max="255" name="user_guess" value="0" class="center">
+        <input type="submit" class="center">
     </form>
 </body>
 </html>
