@@ -1,9 +1,19 @@
 import random
 import numpy as np
 from PIL import Image
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask_socketio import SocketIO
+
+hint = ""
 
 app = Flask(__name__)
+socketio = SocketIO(app)
+
+@socketio.on('update_hint')
+def handle_update_hint():
+    global hint
+    socketio.emit('hint_update', hint)
+
 
 def random_RGB():
    global rgbValues
@@ -12,8 +22,8 @@ def random_RGB():
    im = Image.open('static/css/images/rgbPlaceholder.png')
    im = im.convert('RGBA')
    data = np.array(im)
-   global value
-   value = str(rgbValues)
+   global color_value
+   color_value = str(rgbValues)
 
 
    r1, g1, b1 = 248, 225, 101 # rgbPlaceholder's RGB values
@@ -29,46 +39,39 @@ def random_RGB():
    im.save('static/css/images/rgbColor.png')
 
 def guess_checker():
+   global hint
    global correct_answer
    global distance
    distance =  abs(int(rgbValues[0])-int(user_value))
 
    if user_value == str(rgbValues[0]):
-      correct_answer = True
-      print("--Correct--")
+      hint=("CORRECT YEAH!!!")
    elif distance >= 100:
-      correct_answer = False
-      print("The user is 100 or more off for R")
+      hint=("The user is 100 or more off for R")
    elif distance >= 50:
-      correct_answer = False
-      print("The user is 50 or more off for R")
+      hint=("The user is 50 or more off for R")
    elif distance >= 25:
-      correct_answer = False
-      print("The user is 25 or more off for R")
+      hint=("The user is 25 or more off for R")
    elif distance >= 10:
-      correct_answer = False
-      print("The user is 10 or more off for R")
+      hint=("The user is 10 or more off for R")
    elif distance < 10:
-      correct_answer = False
-      print("The user is under 10 values off for R")
-      
+      hint=("The user is under 10 values off for R")
+
 
 @app.route('/') 
-
 def home():
     random_RGB() 
-    return render_template('home.html', value=value)
+    return render_template('home.html', color_value=color_value, hint=hint)
 
 
 @app.route('/handle_data', methods=['POST'])  
-
 def handle_data():
    global user_value
    formpath = request.form['user_guess']
    user_value = str(formpath) 
    guess_checker()
-   return ("Pass")
+   return render_template('home.html')
 
 
 if __name__ == '__main__':
-   app.run(debug=True, host='0.0.0.0', port=8081)
+    socketio.run(app, debug=True, host='0.0.0.0', port=8081)

@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <title>RGBdle</title>
     <link rel="icon" type="image/x-icon" href="static/css/images/rgbdleFavicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script> 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = io();
+            socket.emit('update_hint');
+        });
+    </script>
     
     <!--This script stops the page from refreshing on submit-->
     <script> 
@@ -35,18 +42,58 @@
             document.getElementById('guessForm').addEventListener('submit', submitForm);
         });
     </script>
+
+    <!--This script will update the hint text whenever the hint variable is updated-->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = io();
+
+        document.getElementById('guessForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            fetch("{{url_for('handle_data')}}", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                socket.emit('update_hint');
+            })
+            .catch(error => {
+                console.error("There was a problem with the fetch operation:", error);
+            });
+        });
+
+        socket.on('hint_update', function(hint) {
+            document.getElementById('hint').innerText = hint;
+        });
+    });
+    </script>
+
 </head>
 
 <body id="background">
-    <img src="static/css/images/rgbdleLogo.png" class="center"
-    width="500"
-    height="200">
-    <img src="static/css/images/rgbColor.png" class="center" id=border>
-    <p id="dev_testing">Current Value: {{ value }}</p> <!--DEV This is for testing, delete when finished-->
-   
-    <form id="guessForm">
-        <input type="number" min="0" max="255" name="user_guess" value="0" class="center">
-        <input type="submit" class="center">
-    </form>
+    <div>
+        <img src="static/css/images/rgbdleLogo.png" class="center"
+        width="500"
+        height="200">
+        <img src="static/css/images/rgbColor.png" class="center" id=border>
+    </div>
+    <p id="dev_testing">Current Value: {{ color_value }}</p> <!--DEV This is for testing, delete when finished-->
+   <div>
+        <form id="guessForm">
+            <input type="number" min="0" max="255" name="user_guess" value="0" class="center">
+            <input type="submit" class="center">
+        </form>
+        <p id="hint">{{ hint }}</p>
+    </div>
+
 </body>
 </html>
